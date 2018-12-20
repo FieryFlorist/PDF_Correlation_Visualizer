@@ -1,0 +1,32 @@
+; A simple function to run the PDF transform.
+; This is similar to a Fourier transform, but Q*sin(Qr) is used instead of just sin(Qr).
+; The error function calculates average error, given an estimate for the the error
+; The lorch functions will include a lorch modification, or any other modification function you wish to use.
+
+FUNCTION pdf_trans, q_in, data_in, r_out, dq
+	tovpi = 0.63661977236
+	r_size = size(r_out)
+	rsinqr = dq * ((make_array(r_size[1])+1)## q_in) * sin(r_out ## q_in)
+	return, [[r_out], [transpose((rsinqr ## data_in))]]
+END
+
+FUNCTION pdf_lorch, q_in, data_in, r_out, dq, lorch_in
+	tovpi = 0.63661977236
+	r_size = size(r_out)
+	rsinqr = dq * ((make_array(r_size[1])+1)## (q_in * lorch_in)) * sin(r_out ## q_in)
+	return, [[r_out], [transpose((rsinqr ## data_in))]]
+END
+
+FUNCTION pdf_err, q_in, error_in, r_out, dq
+	tovpi = 0.63661977236
+	r_size = size(r_out)
+	rsinqr = (dq^2) * (((make_array(r_size[1])+1) ## q_in) * sin(r_out ## q_in))^2
+	return, [[r_out], [transpose(sqrt(rsinqr ## (error_in^2)))]]
+END
+
+FUNCTION lorch_err, q_in, error_in, r_out, dq, lorch_in
+	tovpi = 0.63661977236
+	r_size = size(r_out)
+	rsinqr = (dq^2) * (((make_array(r_size[1])+1) ## (q_in*lorch_in)) * sin(r_out ## q_in))^2
+	return, [[r_out], [transpose(sqrt(rsinqr ## error_in^2))]]
+END
